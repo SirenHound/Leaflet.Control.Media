@@ -54,7 +54,7 @@ L.Control.Media = L.Control.extend({
     this._container = L.DomUtil.create('div');
     var playButton = L.DomUtil.create('span','play-button', this._container);
     playButton.innerHTML = "▶";
-    playButton.on("click", this.play, this);
+    L.DomEvent.on(playButton, "click", this.play, this);
     return this._container;
   },
 
