@@ -43,12 +43,12 @@ L.Control.Media = L.Control.extend({
     // Assign animation functions
 
     //for example until we can generalize
-//    this._marker = L.circleMarker(map.getCenter()).addTo(map);
+    //    this._marker = L.circleMarker(map.getCenter()).addTo(map);
 
-//    this._followHandler = new L.Handler.Follow(this._marker);
+    //    this._followHandler = new L.Handler.Follow(this._marker);
 
     // for testing
-    this.play();
+    //this.play();
 
 
     this._container = L.DomUtil.create('div');
