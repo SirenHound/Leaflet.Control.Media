@@ -9,18 +9,20 @@ L.Control.Media = L.Control.extend({
     position: 'bottomleft',
     animationStart: Date.UTC(2000, 00, 01),//ms to start animation from, eg. UTC DateTime for most events
     duration: 600000, // 10 minutes
-    stepFunction: function(timestamp){
-        if (this._currentSecond === Math.trunc(timestamp/1000, 3)){
-          this._fps++;
-        }
-        else{
-          //console.log(this._currentSecond+"s");
-          console.log("Playing at " + this._fps + "fps");
-          console.log("Animation speed: " + this._multiplier +"x");
-          this._fps = 0;
-          this._currentSecond = Math.trunc(timestamp/1000, 3);
-        }
-      },
+
+    animations: [{
+      context: {},
+      animation: function(pointer, funcArgs){ //_animFunc
+        var from = 0; var to = 1;
+        this._start = this._start || pointer; // arbitrarily start this sample animation at the first pointer value
+        this._end = this._start + 30000; // just say it lasts 30sec
+        // trying to incorporate follow layer
+        //this._followHandler.followLayer(editableGroup.getLayers()[0], )
+        this._layer = this._layer || editableGroup.getLayers()[0];
+        console.log(pointer, this._start, this._end, this._layer, from, to);
+      }
+    }],
+
     stop: true, // stops, not changes speed of animation (0x is pause)
     record: false, // This seems necessary but will have its own set of problems requiring listeners all over the place
     stepForward: false, //  >|
@@ -32,20 +34,28 @@ L.Control.Media = L.Control.extend({
     pause: true,
     play: true,
     ffwd: true,
-// Example symbology <<   <  <|   ||   |>  >    >>
+    // Example symbology <<   <  <|   ||   |>  >    >>
     speeds: [-8, -4, -2, -1, -0.5, 0, 0.5, 1, 2, 4, 8] // Multiplier: An array of speeds to make available to this player
   },
   onAdd: function(map){
     this._stopped = true; // prevent active animations when added to map.
 
+    // Assign animation functions
 
     //for example until we can generalize
-    this._marker = L.circleMarker(map.getCenter()).addTo(map);
+//    this._marker = L.circleMarker(map.getCenter()).addTo(map);
 
-    this._followHandler = new L.Handler.Follow(this._marker);
+//    this._followHandler = new L.Handler.Follow(this._marker);
+
+    // for testing
+    this.play();
 
 
-    return L.DomUtil.create('div');
+    this._container = L.DomUtil.create('div');
+    var playButton = L.DomUtil.create('span','play-button', this._container);
+    playButton.innerHTML = "▶";
+    playButton.on("click", this.play, this);
+    return this._container;
   },
 
   // TODO Customize L.Util.requestAnimFrame to have layer of control
@@ -83,20 +93,27 @@ L.Control.Media = L.Control.extend({
     }
   },
 
-  /** This is the animation that is being controlled.
+  stop: function(){
+    this._stopped = true;
+  },
+  /** Runs the animation provided
+  * @param {AnimFunction} func - The function that represents the animation. It should accept a timestamp argument
+  currently also gets a status object, but will be fixed to be given other arguments too
+  * @param {Object} cxt - The 'this' context to call the function with.
+  * @param {DOMHighResTimeStamp} timestamp - Maybe it's a highres timestamp. check.
+  * @param {...Object} rest - Additional arguments for AnimFunction.
   */
-  sampleAnimation: function(func, cxt, timestamp, status){
-    var funcArgs = Array.prototype.slice.call(arguments, 3);
+  runAnimation: function(func, cxt, timestamp, ...rest){
 
     var dateObj = new Date(timestamp);//don't do this in final draft, just write a method to do it yourself without instances
 
     console.log("pointer: "+dateObj.toUTCString());
 
-    //func.apply(cxt, funcArgs);
-    func.call(cxt, 0, 1, timestamp);
+    rest.unshift(timestamp); // push timestamp to front of rest array, so the animation function can be called with its arguments
+    func.apply(cxt, rest);
   },
-  _animFunc: function(from, to, pointer){
-
+  _animFunc: function(pointer, funcArgs){
+    var from = 0; var to = 1;
     this._start = this._start || pointer; // arbitrarily start this sample animation at the first pointer value
     this._end = this._start + 30000; // just say it lasts 30sec
     // trying to incorporate follow layer
@@ -104,10 +121,8 @@ L.Control.Media = L.Control.extend({
     this._layer = this._layer || editableGroup.getLayers()[0];
     this._m_lineTo(pointer, this._start, this._end, this._layer, from, to);
   },
-
-  // while____ functions might be able to be consolidated into on function, since they are just calling each other through if gates anyway.
-  // however, consider 'preclick' actions, such as pause loop requiring to alter this._p before resuming animation.
-  // see 'duringPlayback'
+  /** Requests frames while a control is running
+  */
   duringPlayback: function(timestamp){
     // number relative to anim NOT timestamp 0...9 mx1: 0123456789
     // Should give a consistant time in ms for the animation events, ie, an animation 10s long will have a pointer within that range
@@ -117,73 +132,48 @@ L.Control.Media = L.Control.extend({
       var progress = (this._pointer - this._animStart)/this.options.duration;
       if (this._stopped){
         this._pointer = this._animStart;
+        // TODO Should call the animation functions one more time to place them at current control time.
+
         this._playing = false; //TODO the rest
         return false;
       }
 
       // Performance variables
-      // dirty, only updates every second TODO invert seconds per frame
-      if (!this._stopped && this._lastTimestamp){
-        var fps = 1000/(timestamp - this._lastTimestamp);
+      if (!this._stopped){
+        var fps = this._lastTimestamp? 1000/(timestamp - this._lastTimestamp):0;
+        this._lastTimestamp = timestamp;
 
 
-      //Build status object
-      var status = {
-        fps: fps, // Current animation speed in frames per second
-        orginalTimestamp: timestamp, // Timestamp recieved by the callback wrapper
-        playerStart: this._animStart, // Earliest point that this controller will animate
-        playerEnd: this._animEnd, // Latest point that this controller will animate
-        playerProgress: progress // Current progress through players timespan
-      };
-      // Call animations here
-      this.sampleAnimation.call(this, this._animFunc, this._followHandler, this._pointer, status);
+        //Build status object
+        var status = {
+          fps: fps, // Current animation speed in frames per second
+          orginalTimestamp: timestamp, // Timestamp recieved by the callback wrapper
+          playerStart: this._animStart, // Earliest point that this controller will animate
+          playerEnd: this._animEnd, // Latest point that this controller will animate
+          playerProgress: progress // Current progress through players timespan
+        };
+        // Call animations here
+        this.options.animations.forEach(function(animationObject){
+          var animation = animationObject.animation;
+          var cxt = animationObject.context;
+          this.runAnimation.call(this, animation, cxt, this._pointer, status);
+        }, this);
 
-      requestAnimationFrame(this.duringPlayback.bind(this));
+        requestAnimationFrame(this.duringPlayback.bind(this));
+      }
     }
     else { //pointer out of range, perhaps animation was completed, or pointer was OOR to start with.
       this._stopped = true; // prevent active animations when added to map.
     }
   },
-
-  /** Continues to request frames when the animation has been paused. this is a requestAnimationFrame function.
-  * @param timestamp
-  */
-  whilePaused: function(timestamp){
-    //console.count("timestamp", timestamp);
-    var pauseStartTime = this._p;
-    // Check if still paused
-    if (this._stopped){
-      this._playing = this._paused = this._fastForwarding = false;
-      return false;
-    }
-    if (this._paused){
-      console.log("paused");
-      // Other things we can do is disable the other buttons, like ffwd etc.
-      requestAnimationFrame(this.whilePaused.bind(this));
-    }
-    // Resume play
-    else{
-      this._p += performance.now() - pauseStartTime; // offset p by amount of time paused
-      requestAnimationFrame(this.whilePlaying.bind(this));
-    }
-  },
-
-  //  var fps = 0; var second;
-  whilePlaying: function(timestamp){
-    //console.count("timestamp", timestamp);
-    if (this._paused){
-      requestAnimationFrame(this.whilePaused.bind(this));
-    }
-    else if(this._fastForwarding){  // flip flops if _fastForwarding and _playing are both true
-      requestAnimationFrame(this.whileFastForwarding.bind(this));
-    }
-    else if(this._playing){
-      if (timestamp < this._p + this.options.duration){
-        this.options.stepFunction.call(this, timestamp);
-        requestAnimationFrame(this.whilePlaying.bind(this));
-      }
-    }
-  },
+  addAnimation: function(func, cxt, ...rest){
+    var animationObject = {
+      context: cxt,
+      animation: func,
+      args: rest
+    };
+    this.options.animations.push(animationObject);
+  }
 });
 /*
   speedMultiplier = 2;
