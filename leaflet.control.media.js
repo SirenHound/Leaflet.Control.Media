@@ -115,6 +115,7 @@ L.Control.Media = L.Control.extend({
   },
 
   stop: function(){
+    this._playing = false;
     this._stopped = true;
   },
   /** Runs the animation provided
@@ -185,6 +186,7 @@ L.Control.Media = L.Control.extend({
     }
     else { //pointer out of range, perhaps animation was completed, or pointer was OOR to start with.
       this._stopped = true; // prevent active animations when added to map.
+      this._playing = false; // prevent active animations when added to map.
     }
   },
   addAnimation: function(func, cxt, ...rest){
