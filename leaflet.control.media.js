@@ -181,7 +181,13 @@ L.Control.Media = L.Control.extend({
       }
       if (this._stopped){
         this._pointer = this._animStart;
+
         // TODO Should call the animation functions one more time to place them at current control time.
+        this.options.animations.forEach(function(animationObject){
+          var animation = animationObject.animation;
+          var cxt = animationObject.context;
+          this.runAnimation.call(this, animation, cxt, this._pointer, status);
+        }, this);
 
         this._playing = false; //TODO the rest
         return false;
