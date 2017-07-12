@@ -117,6 +117,8 @@ L.Control.Media = L.Control.extend({
   stop: function(){
     this._playing = false;
     this._stopped = true;
+    // Reset animations
+    requestAnimationFrame(this.duringPlayback.bind(this));
   },
   /** Runs the animation provided
   * @param {AnimFunction} func - The function that represents the animation. It should accept a timestamp argument
@@ -152,6 +154,31 @@ L.Control.Media = L.Control.extend({
 
     if (this._pointer > this._animStart && this._pointer < this._animEnd){
       var progress = (this._pointer - this._animStart)/this.options.duration;
+
+      // Performance variables
+      var fps = this._lastTimestamp? 1000/(timestamp - this._lastTimestamp):0;
+      this._lastTimestamp = timestamp;
+
+
+      //Build status object
+      var status = {
+        fps: fps, // Current animation speed in frames per second
+        orginalTimestamp: timestamp, // Timestamp recieved by the callback wrapper
+        playerStart: this._animStart, // Earliest point that this controller will animate
+        playerEnd: this._animEnd, // Latest point that this controller will animate
+        playerProgress: progress // Current progress through players timespan
+      };
+      // Call animations here
+      this.options.animations.forEach(function(animationObject){
+        var animation = animationObject.animation;
+        var cxt = animationObject.context;
+        this.runAnimation.call(this, animation, cxt, this._pointer, status);
+      }, this);
+
+
+      if (!this._stopped){
+        requestAnimationFrame(this.duringPlayback.bind(this));
+      }
       if (this._stopped){
         this._pointer = this._animStart;
         // TODO Should call the animation functions one more time to place them at current control time.
@@ -160,29 +187,6 @@ L.Control.Media = L.Control.extend({
         return false;
       }
 
-      // Performance variables
-      if (!this._stopped){
-        var fps = this._lastTimestamp? 1000/(timestamp - this._lastTimestamp):0;
-        this._lastTimestamp = timestamp;
-
-
-        //Build status object
-        var status = {
-          fps: fps, // Current animation speed in frames per second
-          orginalTimestamp: timestamp, // Timestamp recieved by the callback wrapper
-          playerStart: this._animStart, // Earliest point that this controller will animate
-          playerEnd: this._animEnd, // Latest point that this controller will animate
-          playerProgress: progress // Current progress through players timespan
-        };
-        // Call animations here
-        this.options.animations.forEach(function(animationObject){
-          var animation = animationObject.animation;
-          var cxt = animationObject.context;
-          this.runAnimation.call(this, animation, cxt, this._pointer, status);
-        }, this);
-
-        requestAnimationFrame(this.duringPlayback.bind(this));
-      }
     }
     else { //pointer out of range, perhaps animation was completed, or pointer was OOR to start with.
       this._stopped = true; // prevent active animations when added to map.
