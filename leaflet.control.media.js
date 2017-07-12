@@ -51,13 +51,34 @@ L.Control.Media = L.Control.extend({
     //this.play();
 
 
-    this._container = L.DomUtil.create('div');
-    var playButton = L.DomUtil.create('span','play-button', this._container);
-    playButton.innerHTML = "▶";
-    L.DomEvent.on(playButton, "click", function(evt){ this.play(); }, this);
+    this._container = this._createControl();
     return this._container;
   },
+  _createControl: function(){
+    var control = L.DomUtil.create('div');
+    control.style.fontFamily = "initial"; // Undo leaflet map font that has inconsistant media control characters
+    var rwdButton = L.DomUtil.create('span','rewind-button', control);
+    rwdButton.innerHTML = "⏪";
+    L.DomEvent.on(rwdButton, "click", function(evt){ this.play(-2); }, this);
 
+    var stopButton = L.DomUtil.create('span','stop-button', control);
+    stopButton.innerHTML = "⏹"; // Stop
+    L.DomEvent.on(stopButton, "click", function(evt){ this.stop(); }, this);
+
+    var pauseButton = L.DomUtil.create('span','pause-button', control);
+    pauseButton.innerHTML = "⏸"; // Pause
+    L.DomEvent.on(pauseButton, "click", function(evt){ this.play(0); }, this);
+
+    var playButton = L.DomUtil.create('span','play-button', control);
+    playButton.innerHTML = "▶️";
+    L.DomEvent.on(playButton, "click", function(evt){ this.play(); }, this);
+
+    var ffwdButton = L.DomUtil.create('span','ffwd-button', control);
+    ffwdButton.innerHTML = "⏩";
+    L.DomEvent.on(ffwdButton, "click", function(evt){ this.play(2); }, this); // TODO increase multiplier with subsequent clicks
+
+    return control;
+  },
   // TODO Customize L.Util.requestAnimFrame to have layer of control
   requestAnimFrame:function(func, context, immed){
     var win = window;
