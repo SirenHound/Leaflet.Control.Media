@@ -81,7 +81,7 @@ function onMapClick(e) {
 	    },
 	   context:{map: map, latlng:map.getCenter(), marker: L.marker(map.getCenter()).addTo(map)}
   	}]
-	var mediaControl = new L.Control.Media().addTo(map);
+	var mediaControl = new L.Control.Media({animations:animations}).addTo(map);
 
 </script>
 </body>
