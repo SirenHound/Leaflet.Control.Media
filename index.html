@@ -72,7 +72,14 @@ var pathFour = L.curve(['M',[46.86019101567027,-29.047851562500004],
 function onMapClick(e) {
     console.log(e.latlng);
 }
-map.on('click', onMapClick);
+//map.on('click', onMapClick);
+	var animations = [{animation:function(timestamp){
+		var r = 0.3; //radians per second
+		var pt = this.map.latLngToLayerPoint(this.latlng).add(L.point(Math.cos(r * timestamp/1000), Math.sin(r * timestamp/1000)));
+		this.marker.setLatLng(this.map.layerPointToLatLng(pt));
+	},context:{map: map, latlng:map.getCenter(), marker: L.marker(map.getCenter()).addTo(map)}]
+	var mediaControl = new L.Control.Media().addTo(map);
+	
 </script>
 </body>
 </html>
