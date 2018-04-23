@@ -8,7 +8,7 @@ L.Control.Media = L.Control.extend({
   options: {
     position: 'bottomleft',
     animationStart: Date.UTC(2000, 00, 01),//ms to start animation from, eg. UTC DateTime for most events
-    duration: 6000, // 10 minutes
+    duration: 6000, // in ms
     // resetOnEnd: true, // Once the animation is done, reset to start by stopping the animation.
     animations: [{
       context: {},
