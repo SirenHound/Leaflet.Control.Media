@@ -74,7 +74,8 @@ var animations = [
     {
 	animation: function(timestamp){
 	    var r = 0.3; //radians per second
-	    var cenMk = L.circleMarker(this.latlng).addTo(this.map);
+	    this._cenMk = this._cenMk || L.circleMarker(this.latlng);
+	    this._cenMk.addTo(this.map);
 	    var pt = this.map.latLngToLayerPoint(this.latlng)
             .add(L.point(Math.cos(r * timestamp / 1000), Math.sin(r * timestamp / 1000))
             .multiplyBy(100));
