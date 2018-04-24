@@ -69,19 +69,15 @@ var pathFour = L.curve(['M',[46.86019101567027,-29.047851562500004],
 						   [46.70973594407157,-19.907226562500004],
 					   'T',[46.6795944656402,-11.0302734375]], {dashArray: 5, animate: {duration: 3000, iterations: Infinity}}).addTo(map);
 
-function onMapClick(e) {
-    console.log(e.latlng);
-}
-//map.on('click', onMapClick);
-	var animations = [{
-	    animation:function(timestamp){
-		var r = 0.3; //radians per second
-		var pt = this.map.latLngToLayerPoint(this.latlng).add(L.point(Math.cos(r * timestamp/1000), Math.sin(r * timestamp/1000)).multiplyBy(100));
-		this.marker.setLatLng(this.map.layerPointToLatLng(pt));
-	    },
-	   context:{map: map, latlng:map.getCenter(), marker: L.marker(map.getCenter()).addTo(map)}
-  	}]
-	var mediaControl = new L.Control.Media({animations:animations}).addTo(map);
+var animations = [{
+	animation:function(timestamp){
+	var r = 0.3; //radians per second
+	var pt = this.map.latLngToLayerPoint(this.latlng).add(L.point(Math.cos(r * timestamp/1000), Math.sin(r * timestamp/1000)).multiplyBy(100));
+	this.marker.setLatLng(this.map.layerPointToLatLng(pt));
+	},
+	context:{map: map, latlng:map.getCenter(), marker: L.marker(map.getCenter()).addTo(map)}
+}]
+var mediaControl = new L.Control.Media({animations:animations, position: 'topright'}).addTo(map);
 
 </script>
 </body>
