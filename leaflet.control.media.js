@@ -96,6 +96,67 @@ L.Control.Media = L.Control.extend({
 
     //return L.Util.requestAnimFrame.apply(null, arguments);
   },
+
+/*
+
+var cancelFn = window.cancelAnimationFrame ||
+        getPrefixed('CancelAnimationFrame') ||
+        getPrefixed('CancelRequestAnimationFrame') ||
+        function (id) { window.clearTimeout(id); };
+*/
+
+  utilRequestAnimFrame: function (fn, context, immediate) {
+    function getPrefixed(name) {
+      var i, fn,
+          prefixes = ['webkit', 'moz', 'o', 'ms'];
+
+      for (i = 0; i < prefixes.length && !fn; i++) {
+        fn = window[prefixes[i] + name];
+      }
+
+      return fn;
+    }
+    /** Must be defined outside of timeoutDefer so it isn't constantly reset.
+    */
+    var nextTime = 0;
+    /** Fallback function for if browser does not support requestAnimationFrame. Calls the function every 16ms
+    * @param {AnimationFunction} fn - The animation function to call every 16ms
+    * @returns {timeoutID} An id that can be used to cancel the timeout with window.clearTimeout
+    */
+    function timeoutDefer(fn) {
+      var time = +new Date(),
+      // If less than 16ms has passed (say 12ms) since the lastTime this was called set timeout accordingly (4ms) to get back on track
+      // timeToCall = Math.max(0, 16 - (12))
+          timeToCall = Math.max(0, 16 - (time - nextTime));
+
+      nextTime = time + timeToCall; // Possible logic fault, sets lastTime to the next call
+      /*
+      consider scenario calling timeoutDefer multiple times within 16ms:
+      time = 1000, lastTime = 0;
+      timeoutDefer(fn); time = 1000, lastTime = 16-(1000-0) = 0; function scheduled for 0ms from now (1000)
+      timeoutDefer(fn); time = 1000, lastTime = 16-(1000-1000) = 16; function scheduled for 16ms from now (1016)
+      timeoutDefer(fn); time = 1010, lastTime = 16-(1010-1016) = 22; function scheduled for 22ms from now (1032)
+      */
+
+      return window.setTimeout(fn, timeToCall);
+    }
+    /**
+    * @param {AnimationFunction} fn - The animation function to call every 16ms
+    * @returns {(timeoutID|requestID} Can be used to cancel the timeout or animationRequest
+    */
+    var requestFn = window.requestAnimationFrame ||
+      getPrefixed('RequestAnimationFrame') || timeoutDefer;
+    //******************************
+		fn = L.bind(fn, context);
+
+		if (immediate && requestFn === timeoutDefer) {
+			fn();
+		} else {
+      // Calls the safe requestAnimationFrame function using window context as fn would expect if it isn't bound
+			return requestFn.call(window, fn);
+		}
+	},
+
   /** Runs the control clock at the given speed
   * @param {number} [speed = 1] - The multiplier to run the animation
   */

@@ -69,6 +69,54 @@ var pathFour = L.curve(['M',[46.86019101567027,-29.047851562500004],
 						   [46.70973594407157,-19.907226562500004],
 					   'T',[46.6795944656402,-11.0302734375]], {dashArray: 5, animate: {duration: 3000, iterations: Infinity}}).addTo(map);
 
+// TODO Store these, in a database or something... or file, la de da
+var bannerPath = L.polyline([
+	//------- (Start) The Incredible Hulk ------------
+	[42.3754942,-71.1189008],  // .Harvard University
+	[38.871861,-77.0584556],   // .Pentagon
+	[-11.4430331,-55.2735656], // Brazil
+	[15.2612783,-90.9965361],  // Guatamala
+	[37.5247764,-77.5633012],  // Culver University, Virginia. (fictitious)
+	[37.5698971,-77.485054],   // Stanley's Pizza, Virginia. (fictitious)
+	[37.5247764,-77.5633012],  // Culver University, Virginia. (fictitious)
+	[35.6123966,-83.4646095],  // Smoky Mountain Forest Tennessee/North Carolina
+	[40.8200857,-73.9493677],  // Grayburn College, NYC Uptown (fictitious, putting it on 'The City College of New York')
+	[40.8100246,-73.9500815],  // .Apollo Theatre Harlem, NYC
+	[52.3721929,-126.754034]   // Bella Coola, BC, Canada
+	//-------(End) The Incredible Hulk ------------
+	//-------(Start) Avengers -----------------
+	// Calcutta
+	// Helicarrier (fictitious) off east coast?
+	// ... Helicarrer hyjinx
+	// Abandoned warehouse en route to NYC
+	// NYC
+	// Schwarma Store
+	//-------(End) Avengers -----------------
+	// .Avengers Tower (fictitious) Metlife Building (A:AOU)
+	//-------(Start) Avengers: Age of Ultron -----------------
+	// Strucker's Base, Sokovia (fictitious) Eastern Europe appears to be around north east Italy (CA:CW)
+	// .Avengers Tower (fictitious)
+	// African coast (influenced by Scarlet Witch)
+	// Johannesburg (fight with Stark)
+	// Hawkeye's Safehouse (fictitious)
+	// Avengers Tower (fictitious)
+	// Strucker's Base, Sokovia (fictitious)
+	// Novi Grad, Sokovia (fictitious)
+	// Helicarrer (fictitious), Sokovia
+	// Quinjet (fictitious), (to dispatch Ultron)
+	// Something falls in the Banda Sea ? Misdirection? (its a long way from Eastern Europe, and there was no confirmation)
+	//-------(End) Avengers: Age of Ultron -----------------
+	// Wormhole to Sakaar
+	//-------(Start) Thor: Ragnarok -----------------
+	// Offworld hyjinx (currently out of project scope)
+	//-------(End) Thor: Ragnarok -----------------
+	//-------(Start) Avengers: Infinity War -----------------
+	// Sanctum Santorum (fictitious), 177A Bleecker Street NYC
+	// Wakanda (fictitious) via Quinjet w/Rhodey
+	//...
+]);
+bannerPath.addTo(map);
+
 function onMapClick(e) {
     console.log(e.latlng);
 }
