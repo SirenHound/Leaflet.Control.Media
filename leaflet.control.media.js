@@ -8,7 +8,7 @@ L.Control.Media = L.Control.extend({
   options: {
     position: 'bottomleft',
     animationStart: Date.UTC(2000, 00, 01),//ms to start animation from, eg. UTC DateTime for most events
-    duration: 6000, // in ms
+    duration: 60000, // in ms
     // resetOnEnd: true, // Once the animation is done, reset to start by stopping the animation.
     animations: [{
       context: {},
@@ -39,16 +39,6 @@ L.Control.Media = L.Control.extend({
   },
   onAdd: function(map){
     this._stopped = true; // prevent active animations when added to map.
-
-    // Assign animation functions
-
-    //for example until we can generalize
-    //    this._marker = L.circleMarker(map.getCenter()).addTo(map);
-
-    //    this._followHandler = new L.Handler.Follow(this._marker);
-
-    // for testing
-    //this.play();
 
 
     this._container = this._createControl();
