@@ -71,10 +71,10 @@ var pathFour = L.curve(['M',[46.86019101567027,-29.047851562500004],
 
     // TODO Store these, in a database or something... or file, la de da
     // . used to denote area range smaller than a city
-var bannerPath = L.polyline([
+var bannerPath = L.curve([
 	//------- (Start) The Incredible Hulk ------------
-	[42.3754942,-71.1189008],   // .Harvard University
-	[38.871861,-77.0584556],    // .Pentagon
+	'M', [42.3754942,-71.1189008],   // .Harvard University
+	'L', [38.871861, -77.0584556],    // .Pentagon
 	[-11.4430331,-55.2735656],  // Brazil
 	[15.2612783,-90.9965361],   // Guatamala
 	[37.5247764,-77.5633012],   // Culver University, Virginia. (fictitious)
@@ -89,7 +89,7 @@ var bannerPath = L.polyline([
 	[22.5737435,88.3649086],    // .Kolkata (Calcutta), India
 	[30.0720417, -39.35141],    // Helicarrier (fictitious) Open ocean (Quinjet took a while to take Cap and Coulson from NYC)
     // Quinjet goes over snowy mountains from Studgardt(no snow) Germany, also no snow in "Shakespeare in the Park"
-    [48.215898, 23.003172],     // Approx Possible location on map while Stark is planting his bugs
+    [48.215898, 23.003172],     // Approx Possible location on map while Stark is planting his bugs (on helicarrier screen)
     // Over land when Banner Hulks, Fury tries to get over water, going south (Put the rising sun on the left)
     
 	// ... Helicarrer hyjinx
@@ -109,7 +109,7 @@ var bannerPath = L.polyline([
 
 	[40.7535259, -73.9772662],  // Avengers Tower (fictitious) Creation of Vision
 	[46.6110521, 12.6056186],   // Strucker's Base, Sokovia (fictitious) Rescue Black Widow 1:27:27
-	[46.7559747, 12.5284309]    // Novi Grad, Sokovia (fictitious)
+	[46.7559747, 12.5284309],    // Novi Grad, Sokovia (fictitious)
     
 	// Quinjet (fictitious), (to dispatch Ultron)
 	// Something falls in the Banda Sea ? Misdirection? (its a long way from Eastern Europe, and there was no confirmation)
@@ -119,8 +119,11 @@ var bannerPath = L.polyline([
 	// Offworld hyjinx (currently out of project scope)
 	//-------(End) Thor: Ragnarok -----------------
 	//-------(Start) Avengers: Infinity War -----------------
-	// Sanctum Santorum (fictitious), 177A Bleecker Street NYC
-	// Wakanda (fictitious) via Quinjet w/Rhodey
+	'M', [40.7290877, -74.0003622],    // Sanctum Santorum (fictitious), 177A Bleecker Street NYC via rainbow bridge
+    // Park to meet Tony Stark (via Sling Ring)
+	[40.7290877, -74.0003622],   // Sanctum Santorum (fictitious), 177A Bleecker Street NYC via rainbow bridge
+    // Upstate New York Avengers Facility (check Ant-Man etc)
+	[3.6389563,36.8262069],     // Wakanda (fictitious) via Quinjet w/Rhodey et al.
 	//...
 ],
 {
