@@ -122,7 +122,14 @@ var bannerPath = L.polyline([
 	// Sanctum Santorum (fictitious), 177A Bleecker Street NYC
 	// Wakanda (fictitious) via Quinjet w/Rhodey
 	//...
-]);
+],
+{
+    animation: {
+        duration: 10000,
+        iterations: Infinity
+    },
+    dashArray: 5,
+});
 bannerPath.addTo(map);
 
 function onMapClick(e) {
